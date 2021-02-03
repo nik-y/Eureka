@@ -1,41 +1,98 @@
-var express = require('express');
-var app = express();
-var bodyParser = require('body-parser');
+var express    = require('express'),
+	app        = express(),
+	bodyParser = require('body-parser'),
+	mongoose   = require('mongoose'),
+	Campground = require('./models/campground'),
+	Comment    = require('./models/comment'),
+	seedBD     = require('./seeds');
 
+
+mongoose.connect("mongodb://localhost:27017/yelp_camp", {useNewUrlParser: true, useUnifiedTopology: true});
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
-
-var campgrounds = [
-		{name: "Mount Musk", image: "https://pixabay.com/get/52e3d3404a55af14f1dc84609620367d1c3ed9e04e50774875297fd59f4dc4_340.png"},
-		{name: "Hilbert Hotel", image: "https://pixabay.com/get/57e8d1464d53a514f1dc84609620367d1c3ed9e04e50774875297fd59f4dc4_340.jpg"},
-		{name: "Payne Gyan", image: "https://pixabay.com/get/57e8d1454b56ae14f1dc84609620367d1c3ed9e04e50774875297fd59f4dc4_340.jpg"},
-	{name: "Mount Musk", image: "https://pixabay.com/get/52e3d3404a55af14f1dc84609620367d1c3ed9e04e50774875297fd59f4dc4_340.png"},
-		{name: "Hilbert Hotel", image: "https://pixabay.com/get/57e8d1464d53a514f1dc84609620367d1c3ed9e04e50774875297fd59f4dc4_340.jpg"},
-		{name: "Payne Gyan", image: "https://pixabay.com/get/57e8d1454b56ae14f1dc84609620367d1c3ed9e04e50774875297fd59f4dc4_340.jpg"},
-	{name: "Mount Musk", image: "https://pixabay.com/get/52e3d3404a55af14f1dc84609620367d1c3ed9e04e50774875297fd59f4dc4_340.png"},
-		{name: "Hilbert Hotel", image: "https://pixabay.com/get/57e8d1464d53a514f1dc84609620367d1c3ed9e04e50774875297fd59f4dc4_340.jpg"},
-		{name: "Payne Gyan", image: "https://pixabay.com/get/57e8d1454b56ae14f1dc84609620367d1c3ed9e04e50774875297fd59f4dc4_340.jpg"}
-];
+app.use(express.static(__dirname + '/public'));
+//seedBD(); 
 
 app.get("/", function(req, res) {
 	res.render("landing")
 });
 
+// INDEX ROUTE
 app.get("/campgrounds", function(req, res) {
-	res.render("campgrounds", {campgrounds: campgrounds});
+	Campground.find({}, function(err, allCampgrounds) {
+		res.render("campgrounds/index", {campgrounds: allCampgrounds});
+	});
 });
 
+// CREATE ROUTE
 app.post("/campgrounds", function(req, res) { 
 	var name = req.body.name;
 	var image = req.body.image;
-	var newCampground = {name: name, image: image};
-	campgrounds.push(newCampground);
-	res.redirect("/campgrounds");
+	var discription = req.body.discription;
+	var newCampground = {name: name, image: image, discription: discription};
+	Campground.create(newCampground, function(err, newlyCreated) {
+		if(err) {
+			console.log(err);
+		}
+		else {
+			res.redirect("/campgrounds");	
+		}
+	});
 });
 
+// NEW ROUTE
 app.get("/campgrounds/new", function(req, res) {
-	res.render("new");
+	res.render("campgrounds/new");
 });
+
+// SHOW ROUTE
+app.get("/campgrounds/:id", function(req, res) {
+	Campground.findById(req.params.id).populate("comments").exec(function(err, foundCampground) {
+		if(err) {
+			console.log(err);
+		}
+		else {
+			res.render("campgrounds/show", {campground: foundCampground});
+		}
+	});
+});
+
+// =========================
+// COMMENT ROUTES
+// =========================
+
+app.get("/campgrounds/:id/comments/new", function(req, res) {
+	Campground.findById(req.params.id, function(err, campground) {
+		if(err) {
+			console.log(err);
+		}
+		else {
+			res.render("comments/new", {campground: campground});
+		}
+	})
+});
+
+app.post("/campgrounds/:id/comments", function(req, res) {
+	Campground.findById(req.params.id, function(err, campground) {
+		if(err) {
+			console.log(err);
+			res.redirect("/campgrounds")
+		}
+		else {
+			Comment.create(req.body.comment, function(err, comment) {
+				if(err) {
+					console.log(err);
+				}
+				else {
+					campground.comments.push(comment);
+					campground.save();
+					res.redirect('/campgrounds/' + campground._id);
+				}
+			})	
+		}
+	})
+})
+
 
 app.listen(3001, function() {
 	console.log("The YelpCamp server app has started");
