@@ -16,7 +16,10 @@ var campgroundRoutes = require('./routes/campgrounds'),
 	commentRoutes    = require('./routes/comments'),
 	indexRoutes      = require('./routes/index');
 
-mongoose.connect("mongodb://localhost:27017/yelp_camp", {useNewUrlParser: true, useUnifiedTopology: true});
+var dbUrl = process.env.DBURL || "mongodb://localhost:27017/yelp_camp";
+console.log(dbUrl);
+mongoose.connect(dbUrl, {useNewUrlParser: true, useUnifiedTopology: true});
+// mongoose.connect("mongodb://localhost:27017/yelp_camp", {useNewUrlParser: true, useUnifiedTopology: true});
 // mongoose.connect("mongodb+srv://NikYMLab:elgoog123@cluster0.z3o8p.mongodb.net/test?retryWrites=true&w=majority", {useNewUrlParser: true, useUnifiedTopology: true});
 
 app.use(bodyParser.urlencoded({extended: true}));
