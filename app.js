@@ -55,5 +55,5 @@ app.get("*", function(req, res) {
 })
 
 app.listen(process.env.PORT || 3003, function() {
-	console.log("The Hacks server app has started");
+	console.log("The Eureka server app has started");
 });
