@@ -1,8 +1,8 @@
 var mongoose  = require('mongoose');
 
-var campgroundSchema = new mongoose.Schema({
+var hackSchema = new mongoose.Schema({
 	name: String,
-	price: String,
+	topic: String,
 	image: String,
 	discription: String,
 	author: {
@@ -20,4 +20,4 @@ var campgroundSchema = new mongoose.Schema({
 	]
 });
 
-module.exports = mongoose.model("Campground", campgroundSchema);
+module.exports = mongoose.model("Hack", hackSchema);

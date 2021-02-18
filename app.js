@@ -7,16 +7,16 @@ var express        = require('express'),
 	LocalStrategy  = require('passport-local'),
 	methodOverride = require('method-override');
 	
-var	Campground    = require('./models/campground'),
+var	Hack          = require('./models/hack'),
 	Comment       = require('./models/comment'),
 	User          = require('./models/user'),
 	seedBD        = require('./seeds');
 
-var campgroundRoutes = require('./routes/campgrounds'),
+var hackRoutes       = require('./routes/hacks'),
 	commentRoutes    = require('./routes/comments'),
 	indexRoutes      = require('./routes/index');
 
-var dbUrl = process.env.DBURL || "mongodb://localhost:27017/yelp_camp";
+var dbUrl = process.env.DBURL || "mongodb://localhost:27017/hackdb";
 mongoose.connect(dbUrl, {useNewUrlParser: true, useUnifiedTopology: true});
 
 app.use(bodyParser.urlencoded({extended: true}));
@@ -45,11 +45,15 @@ app.use(function(req, res, next) {
 	next();
 });
 
-
 app.use("/", indexRoutes);
-app.use("/campgrounds", campgroundRoutes);
-app.use("/campgrounds/:id/comments", commentRoutes);
+app.use("/hacks", hackRoutes);
+app.use("/hacks/:id/comments", commentRoutes);
 
-app.listen(process.env.PORT || 3002, function() {
-	console.log("The YelpCamp server app has started");
+app.get("*", function(req, res) {
+	req.flash("error", "Page not found!");
+	res.redirect("/");
+})
+
+app.listen(process.env.PORT || 3003, function() {
+	console.log("The Hacks server app has started");
 });

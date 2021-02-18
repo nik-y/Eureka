@@ -1,43 +1,43 @@
-var Campground = require('../models/campground');
+var Hack = require('../models/hack');
 var Comment = require('../models/comment')
 var middlewareObj = {};
 
-middlewareObj.checkCampgroundOwnership = function(req, res, next) {
+middlewareObj.checkHackOwnership = function(req, res, next) {
 	if(req.isAuthenticated()) {
-		Campground.findById(req.params.id, function(err, foundCampground) {
-			if(err || !foundCampground) {
-				req.flash("error", "Campground not found!");
-				res.redirect("back");
+		Hack.findById(req.params.id, function(err, foundHack) {
+			if(err || !foundHack) {
+				req.flash("error", "Hack not found!");
+				res.redirect("/hacks");
 			}
 			else {
-				if(foundCampground.author.id.equals(req.user._id)) {
+				if(foundHack.author.id.equals(req.user._id)) {
 					next();
 				}
 				else {
 					req.flash("error", "Permission denied!");
-					res.redirect("back");
+					res.redirect("/hacks/" + req.params.id);
 				}
 			}
 		})
 	}
 	else {
 		req.flash("error", "Log in first!")
-		res.redirect("back");
+		res.redirect("/hacks/" + req.params.id);
 	}
 }
 
 middlewareObj.checkCommentOwnership = function(req, res, next) {
 	if(req.isAuthenticated()) {
-		Campground.findById(req.params.id, function(err, foundCampground) {
-			if(err || !foundCampground) {
-				req.flash("error", "Camground not found!");
-				res.redirect("back");
+		Hack.findById(req.params.id, function(err, foundHack) {
+			if(err || !foundHack) {
+				req.flash("error", "Hack not found!");
+				res.redirect('/hacks');
 			}
 			else {
 				Comment.findById(req.params.comment_id, function(err, foundComment) {
 					if(err || !foundComment) {
 						req.flash("error", "Comment not found!");
-						res.redirect("back");
+						res.redirect('/hacks/' + req.params.id);
 					}
 					else {
 						if(foundComment.author.id.equals(req.user._id)) {
@@ -45,7 +45,7 @@ middlewareObj.checkCommentOwnership = function(req, res, next) {
 						}
 						else {
 							req.flash("error", "Permission denied!");
-							res.redirect("back");
+							res.redirect('/hacks/' + req.params.id);
 						}
 					}
 				})
@@ -55,7 +55,7 @@ middlewareObj.checkCommentOwnership = function(req, res, next) {
 	}
 	else {
 		req.flash("error", "Log in first!")
-		res.redirect("back");
+		res.redirect('/hacks/' + req.params.id);
 	}
 }
 

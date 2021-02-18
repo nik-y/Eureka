@@ -2,10 +2,10 @@
 
 <div class="container">
 	<div class="row">
-		<h2 style="text-align: center;"> Add a comment to <%= campground.name %> </h2>
+		<h2 style="text-align: center;"> Add a comment to <strong><%= hack.name %></strong> </h2>
 
 		<div style="width: 30%; margin: 25px auto;">
-			<form action="/campgrounds/<%= campground._id %>/comments" method="POST">
+			<form action="/hacks/<%= hack._id %>/comments" method="POST">
 				<div class="form-group">
 					<input class="form-control" type="text" name="comment[text]" placeholder="text">
 				</div>
@@ -15,7 +15,7 @@
 					<button class="btn btn-lg btn-primary btn-block">Submit!</button>
 				</div>
 			</form>
-			<a href="/campgrounds">Go Back</a>
+			<a href="/hacks">Go Back</a>
 		</div>
 
 	</div>
